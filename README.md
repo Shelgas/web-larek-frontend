@@ -47,6 +47,59 @@ npm run build
 yarn build
 ```
 
+## Базовые компоненты
+
+### Класс EventEmitter
+
+Позволяет компонентам подписаться на события и уведомлять подписчиков о наступлении события
+
+Методы класса:
+- `on<T extends object>(eventName: EventName, callback: (event: T)`  - установить обработчик на событие
+- `off(eventName: EventName, callback: Subscriber)` - снять обработчик с события
+- `emit<T extends object>(eventName: string, data?: T)` - инициировать событие с данными
+- `onAll(callback: (event: EmitterEvent) => void)` - слушать все события
+- `offAll()` - сбросить все обработчики
+- `trigger<T extends object>(eventName: string, context?: Partial<T>)` - создает коллбек триггер, генерирующий событие при вызов
+
+
+### Класс Component
+
+Это базовый абстрактный класс,  который является основой для компонентов проекта.
+Реализует возможность работы с разметкой на странице: переключать класс, добавлять атрибуты для модификации поведения видимости элемента, добавлять текстовые данные, а также возвращать разметку готового элемента.
+
+Конструктор класса:
+- `constructor(protected readonly container: HTMLElement)` - принимает DOM элемент для работы в дочерних компонентах
+
+Методы класса:
+- `toggleClass(element: HTMLElement, className: string, force?: boolean)` -  переключает класс у элемента
+- `setText(element: HTMLElement, value: unknown)` -  устанавливает текстовое содержимое элемента, проверяя наличие переданного элемента
+- `setDisabled(element: HTMLElement, state: boolean)` - делает элемент недоступным для взаимодействия
+- `setHidden(element: HTMLElement)` - делает элемент скрытым, принимает DOM-элемент
+- `setVisible(element: HTMLElement)` - делает элемент видимым
+- `setImage(element: HTMLImageElement, src: string, alt?: string)` - устанавливает теги для изображений
+- `render(data?: Partial<T>): HTMLElement` - возвращает DOM-элемент.
+
+### Класс Model
+АКласс предназначен для создания модельных данных. Модели используются для представления и управления данными в приложении.
+Конструктор класса:
+- `constructor(data: Partial<T>, protected events: IEvents)` - принимает данные и событие
+Метод класса:
+- `emitChanges` - сообщает всем что модель поменялась
+  
+
+### Класс Api
+Обеспечивает взаимодействие с сервером для получения готовых и отправки сформированных приложением данных
+
+Конструктор класса:
+- `baseUrl: string` - адрес сервера
+- `options: RequestInit` - опции для доступа к различным параметрам
+
+Методы класса:
+- `get(uri: string)` - get-запрос на сервер
+- `post(uri: string, data: object, method: ApiPostMethods = 'POST')` - post-запрос на сервер
+- `handleResponse(response: Response): Promise<object>` - обрабатывает ответ от сервера
+
+
 ## Ключевые типы данных
  
  ```
