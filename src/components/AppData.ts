@@ -6,7 +6,8 @@ import {
 	IContactsForm,
     CategoryType,
     IOrderForm,
-    FormErrors
+    FormErrors,
+    IOrderRequest
 } from '../types/index';
 
 export type CatalogChangeEvent = {
@@ -28,16 +29,14 @@ export class AppState extends Model<IAppState> {
     basket: IProduct[] = [];
     catalog: IProduct[];
     formErrors: FormErrors = {};
+    total: number = 0;
 
-    order: IOrderForm = {
+    order: IOrder = {
         address: '',
         payment: '',
-    };
-    contacts: IContactsForm = {
         email: '',
-        phone: ''
-        
-    }
+        phone: '',
+    };
 
     setCatalog(products: IProduct[]) {
         this.catalog = products.map(product => new Product(product, this.events));
@@ -46,10 +45,12 @@ export class AppState extends Model<IAppState> {
 
     addToBasket(product: IProduct) {
 		this.basket.push(product);
+        this.total += product.price;
 	}
 
     removeFromBasket(product: IProduct) {
 		const index = this.basket.indexOf(product);
+        this.total -= product.price;
 		if (index >= 0) {
 			this.basket.splice(index, 1);
 		}
@@ -65,7 +66,7 @@ export class AppState extends Model<IAppState> {
         return true;
     }
 
-    setOrderField(field: keyof IOrderForm, value: string) {
+    setOrderField(field: keyof IOrder, value: string) {
         this.order[field] = value;
 
         if (this.validateOrderForm()) {
@@ -73,12 +74,12 @@ export class AppState extends Model<IAppState> {
         }
     }
 
-    setContactField(field: keyof IContactsForm, value: string) {
-        this.contacts[field] = value;
-
-        if (this.validateContactForm()) {
-            this.events.emit('order:ready', this.order);
-        }
+    getRequest(): IOrderRequest {
+        return Object.assign({ 
+            total: this.total,
+            items: this.basket.map(product => product.id)
+            }, 
+        this.order);
     }
 
 
@@ -90,22 +91,19 @@ export class AppState extends Model<IAppState> {
         if (!this.order.payment) {
             errors.payment = 'Необходимо указать способ оплатые';
         }
-        this.formErrors = errors;
-        this.events.emit('formErrors:change', this.formErrors);
-        return Object.keys(errors).length === 0;
-    }
-
-    validateContactForm() {
-        const errors: typeof this.formErrors = {};
-        if (!this.contacts.email) {
+        if (!this.order.email) {
             errors.email = 'Необходимо указать email';
         }
-        if (!this.contacts.phone) {
+        if (!this.order.phone) {
             errors.phone = 'Необходимо указать номер телефона';
         }
         this.formErrors = errors;
         this.events.emit('formErrors:change', this.formErrors);
         return Object.keys(errors).length === 0;
     }
+
+   clearBasket() {
+    this.basket = [];
+   }
 
 }

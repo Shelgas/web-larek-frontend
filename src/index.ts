@@ -8,6 +8,7 @@ import { Page } from './components/Page';
 import { EventEmitter } from './components/base/events';
 import { Basket } from './components/common/Basket';
 import { Modal } from './components/common/Modal';
+import { Success } from './components/common/Succes';
 import './scss/styles.scss';
 import { IContactsForm, IOrder, IOrderForm, IProduct } from './types';
 import { CDN_URL, API_URL } from './utils/constants';
@@ -140,12 +141,36 @@ events.on('order:submit', () => {
 });
 
 
-events.on(/^order\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
+events.on(/^order\..*:change/, (data: { field: keyof IOrder, value: string }) => {
     appData.setOrderField(data.field, data.value);
 });
 
-events.on(/^contacts\..*:change/, (data: { field: keyof IContactsForm, value: string }) => {
-    appData.setContactField(data.field, data.value);
+events.on(/^contacts\..*:change/, (data: { field: keyof IOrder, value: string }) => {
+    appData.setOrderField(data.field, data.value);
+});
+
+events.on('contacts:submit', () => {
+    console.log(appData.getRequest());
+	api.orderProducts(appData.getRequest())
+		.then((res) => {
+			const success = new Success(cloneTemplate(successTemplate), {
+				onClick: () => {
+					modal.close();
+				},
+			});
+
+			modal.render({
+				content: success.render({
+					total: res.total,
+				}),
+			});
+
+			appData.clearBasket();
+			page.counter = 0;
+		})
+		.catch((err) => {
+			console.error(err);
+		});
 });
 
 
@@ -156,8 +181,6 @@ events.on('formErrors:change', (errors: Partial<IOrder>) => {
 	order.errors = Object.values({ address, payment })
 		.filter((i) => !!i)
 		.join('; ');
-    console.log(email);
-
 	contacts.errors = Object.values({ phone, email })
 		.filter((i) => !!i)
 		.join('; ');

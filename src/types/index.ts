@@ -21,7 +21,12 @@ export interface IOrderForm { // интерфейс формы с адресом
 }
 
 export interface IOrder extends IOrderForm, IContactsForm { // интерфейс данных заказа
-    items: string[];
+
+}
+
+export interface IOrderRequest extends IOrder { 
+    total: number,
+    items: string[]
 }
 
 export interface IAppState { // интерфейс данных приложения
@@ -44,7 +49,11 @@ export interface IBasketCard { // интерфейс корзины
 export interface ILarekAPI { // интерфейс API
     getProducts: () => Promise<IProduct[]>;
     getProductById: (id: string) => Promise<IProduct>;
-    orderProducts: (order: IOrder) => void;
+    orderProducts: (order: IOrder) => Promise<IOrderResult>;
 }
 
 export type FormErrors = Partial<Record<keyof IOrder, string>>;
+
+export interface IOrderResult {
+	total: number;
+}
