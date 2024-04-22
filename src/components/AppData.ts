@@ -35,13 +35,20 @@ export class AppState extends Model<IAppState> {
         items: []
     };
 
-    setCatalog(items: IProduct[]) {
-        this.catalog = items.map(item => new Product(item, this.events));
+    setCatalog(products: IProduct[]) {
+        this.catalog = products.map(product => new Product(product, this.events));
         this.emitChanges('items:changed', { catalog: this.catalog });
     }
 
     addToBasket(product: IProduct) {
 		this.basket.push(product);
+	}
+
+    removeFromBasket(product: IProduct) {
+		const index = this.basket.indexOf(product);
+		if (index >= 0) {
+			this.basket.splice(index, 1);
+		}
 	}
 
     get basketCount() {

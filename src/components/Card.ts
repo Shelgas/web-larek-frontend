@@ -89,8 +89,7 @@ export class CardPreview extends Card {
 
     set status(value: boolean) {
         if (this._price.textContent != `Бесценно`) {
-            console.log(this._price.textContent);
-            value === null
+            value === true
                 ? this.setText(this._buttonElement, 'Убрать')
                 : this.setText(this._buttonElement, 'Купить')
         }

@@ -50,9 +50,11 @@ events.on('items:changed', () => {
 });
 
 events.on('card:select', (item: IProduct) => {
-	const card = new CardPreview(cloneTemplate(cardPreviewTemplate), {
-		onClick: () => events.emit('card:add', item),
-	});
+
+    const callback = item.status === true
+        ? { onClick: () => events.emit('card:remove', item)}
+        : { onClick: () => events.emit('card:add', item)}
+	const card = new CardPreview(cloneTemplate(cardPreviewTemplate), callback);
 	modal.render({
 		content: card.render({
 			title: item.title,
@@ -70,6 +72,13 @@ events.on('card:select', (item: IProduct) => {
 events.on('card:add', (item: IProduct) => {
     appData.addToBasket(item);
     item.status = true;
+    page.counter = appData.basketCount;
+    modal.close();
+});
+
+events.on('card:remove', (item: IProduct) => {
+    appData.removeFromBasket(item);
+    item.status = false;
     page.counter = appData.basketCount;
     modal.close();
 });
