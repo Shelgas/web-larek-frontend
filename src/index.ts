@@ -57,12 +57,21 @@ events.on('card:select', (item: IProduct) => {
 		content: card.render({
 			title: item.title,
 			image: item.image,
-			price: item.price,
 			category: item.category,
 			description: item.description,
+            price: item.price,
+            status: item.status,
+            
 		}),
 	});
 
+});
+
+events.on('card:add', (item: IProduct) => {
+    appData.addToBasket(item);
+    item.status = true;
+    page.counter = appData.basketCount;
+    modal.close();
 });
 
 

@@ -13,6 +13,7 @@ export interface ICard {
     description?: string | string[];
     image: string;
     price: number | null;
+    status: boolean;
 }
 
 export class Card extends Component<ICard> {
@@ -37,6 +38,7 @@ export class Card extends Component<ICard> {
         this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
         this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
         this._category = container.querySelector(`.${blockName}__category`);
+        this._price = container.querySelector(`.${blockName}__price`);
 
         if (actions?.onClick) {
 			container.addEventListener('click', actions.onClick);
@@ -72,6 +74,7 @@ export class CardPreview extends Card {
 		this._description = container.querySelector(`.card__text`);
 		this._buttonElement = container.querySelector(`.card__button`);
 
+        
 		if (actions?.onClick) {
 			if (this._buttonElement) {
 				this._buttonElement.addEventListener('click', actions.onClick);
@@ -82,4 +85,23 @@ export class CardPreview extends Card {
 	set description(value: string) {
 		this.setText(this._description, value);
 	}
+
+
+    set status(value: boolean) {
+        if (this._price.textContent != `Бесценно`) {
+            console.log(this._price.textContent);
+            value === null
+                ? this.setText(this._buttonElement, 'Убрать')
+                : this.setText(this._buttonElement, 'Купить')
+        }
+	}
+
+    set price(value: number | null) {
+        super.price = value; 
+        if (value === null) {
+            this.setText(this._buttonElement, 'Нельзя купить')
+            this.setDisabled(this._buttonElement, true);
+        }
+    }
+
 }

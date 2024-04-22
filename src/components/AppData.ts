@@ -18,13 +18,13 @@ export class Product extends Model<IProduct> {
 	description: string;
 	image: string;
 	category: CategoryType;
-	status: boolean;
+	status: boolean = false;
 	price: number | null;
 }
 
 
 export class AppState extends Model<IAppState> {
-    basket: IProduct[];
+    basket: IProduct[] = [];
     catalog: IProduct[];
 
     order: IOrder = {
@@ -35,10 +35,17 @@ export class AppState extends Model<IAppState> {
         items: []
     };
 
-
     setCatalog(items: IProduct[]) {
         this.catalog = items.map(item => new Product(item, this.events));
         this.emitChanges('items:changed', { catalog: this.catalog });
+    }
+
+    addToBasket(product: IProduct) {
+		this.basket.push(product);
+	}
+
+    get basketCount() {
+        return this.basket.length;
     }
 
 }

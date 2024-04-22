@@ -7,6 +7,7 @@ export interface IProduct {   // интерфейс товаров
 	image: string; 
 	category: CategoryType;
 	price: number | null;
+    status: boolean;
 }
 
 export enum PaymentType { // перечсление способов оплаты заказа
