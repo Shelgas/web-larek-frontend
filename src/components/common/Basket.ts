@@ -5,7 +5,6 @@ import { EventEmitter } from "../base/events";
 interface IBasketView {
     items: HTMLElement[];
     total: number;
-    selected: string[];
 }
 
 export class Basket extends Component<IBasketView> {
@@ -27,27 +26,23 @@ export class Basket extends Component<IBasketView> {
 		}
 
 		this.items = [];
+		
 	}
 
 	set items(items: HTMLElement[]) {
 		if (items.length) {
 			this._list.replaceChildren(...items);
+			this.setDisabled(this._button, false);
 		} else {
 			this._list.replaceChildren(
 				createElement<HTMLParagraphElement>('p', {
 					textContent: 'Корзина пуста',
 				})
 			);
-		}
-	}
-
-	set selected(items: string[]) {
-		if (items.length) {
-			this.setDisabled(this._button, false);
-		} else {
 			this.setDisabled(this._button, true);
 		}
 	}
+
 
 	set total(total: number) {
 		this.setText(this._total, formatNumber(total) + ' ' + 'синапсов');

@@ -10,11 +10,6 @@ export interface IProduct {   // интерфейс товаров
     status: boolean;
 }
 
-export enum PaymentType { // перечсление способов оплаты заказа
-    Online = 'Онлайн',
-    UponReceipt = 'При получении'
-  }
-
 export interface IContactsForm { // интерфейс формы контактных данных 
 	phone: string;
 	email: string;
@@ -22,7 +17,7 @@ export interface IContactsForm { // интерфейс формы контакт
 
 export interface IOrderForm { // интерфейс формы с адресом доставки
 	address: string;
-	payment: PaymentType;
+	payment: string;
 }
 
 export interface IOrder extends IOrderForm, IContactsForm { // интерфейс данных заказа
@@ -51,3 +46,5 @@ export interface ILarekAPI { // интерфейс API
     getProductById: (id: string) => Promise<IProduct>;
     orderProducts: (order: IOrder) => void;
 }
+
+export type FormErrors = Partial<Record<keyof IOrder, string>>;

@@ -1,13 +1,15 @@
 import { AppState } from './components/AppData';
 import { BasketItem } from './components/BasketItem';
 import { Card, CardPreview } from './components/Card';
+import { Contacts } from './components/Contacts';
 import { LarekAPI } from './components/LarekAPI';
+import { Order } from './components/Order';
 import { Page } from './components/Page';
 import { EventEmitter } from './components/base/events';
 import { Basket } from './components/common/Basket';
 import { Modal } from './components/common/Modal';
 import './scss/styles.scss';
-import { IProduct } from './types';
+import { IContactsForm, IOrder, IOrderForm, IProduct } from './types';
 import { CDN_URL, API_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 
@@ -38,6 +40,8 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
 // Переиспользуемые части интерфейса
 const basket = new Basket(cloneTemplate(basketTemplate), events);
+const order = new Order(cloneTemplate<HTMLFormElement>(orderFormTemplate), events);
+const contacts = new Contacts(cloneTemplate<HTMLFormElement>(contactsFormTemplate), events);
 
 
 
@@ -114,6 +118,50 @@ events.on('basketItem:remove', (item: IProduct) => {
     events.emit('basket:open');
 });
 
+events.on('order:open', () => {
+	modal.render({
+		content: order.render({
+			address: '',
+			valid: false,
+			errors: [],
+		}),
+	});
+});
+
+events.on('order:submit', () => {
+	modal.render({
+		content: contacts.render({
+			email: '',
+			phone: '',
+			valid: false,
+			errors: [],
+		}),
+	});
+});
+
+
+events.on(/^order\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
+    appData.setOrderField(data.field, data.value);
+});
+
+events.on(/^contacts\..*:change/, (data: { field: keyof IContactsForm, value: string }) => {
+    appData.setContactField(data.field, data.value);
+});
+
+
+events.on('formErrors:change', (errors: Partial<IOrder>) => {
+	const { email, phone, address, payment } = errors;
+	order.valid = !address && !payment;
+	contacts.valid = !email && !phone;
+	order.errors = Object.values({ address, payment })
+		.filter((i) => !!i)
+		.join('; ');
+    console.log(email);
+
+	contacts.errors = Object.values({ phone, email })
+		.filter((i) => !!i)
+		.join('; ');
+});
 
 // заморозка прокрутки при открытии модалки
 events.on('modal:open', () => {

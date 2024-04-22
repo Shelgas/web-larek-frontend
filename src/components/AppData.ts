@@ -4,8 +4,9 @@ import {
 	IOrder,
 	IProduct,
 	IContactsForm,
-    PaymentType,
-    CategoryType
+    CategoryType,
+    IOrderForm,
+    FormErrors
 } from '../types/index';
 
 export type CatalogChangeEvent = {
@@ -26,14 +27,17 @@ export class Product extends Model<IProduct> {
 export class AppState extends Model<IAppState> {
     basket: IProduct[] = [];
     catalog: IProduct[];
+    formErrors: FormErrors = {};
 
-    order: IOrder = {
-        email: '',
-        phone: '',
+    order: IOrderForm = {
         address: '',
-        payment: PaymentType.Online,
-        items: []
+        payment: '',
     };
+    contacts: IContactsForm = {
+        email: '',
+        phone: ''
+        
+    }
 
     setCatalog(products: IProduct[]) {
         this.catalog = products.map(product => new Product(product, this.events));
@@ -53,6 +57,55 @@ export class AppState extends Model<IAppState> {
 
     get basketCount() {
         return this.basket.length;
+    }
+
+    get isBasketEmpty() {
+        if (this.basket.length > 0)
+            return false;
+        return true;
+    }
+
+    setOrderField(field: keyof IOrderForm, value: string) {
+        this.order[field] = value;
+
+        if (this.validateOrderForm()) {
+            this.events.emit('order:ready', this.order);
+        }
+    }
+
+    setContactField(field: keyof IContactsForm, value: string) {
+        this.contacts[field] = value;
+
+        if (this.validateContactForm()) {
+            this.events.emit('order:ready', this.order);
+        }
+    }
+
+
+    validateOrderForm() {
+        const errors: typeof this.formErrors = {};
+        if (!this.order.address) {
+            errors.address = 'Необходимо указать адрес';
+        }
+        if (!this.order.payment) {
+            errors.payment = 'Необходимо указать способ оплатые';
+        }
+        this.formErrors = errors;
+        this.events.emit('formErrors:change', this.formErrors);
+        return Object.keys(errors).length === 0;
+    }
+
+    validateContactForm() {
+        const errors: typeof this.formErrors = {};
+        if (!this.contacts.email) {
+            errors.email = 'Необходимо указать email';
+        }
+        if (!this.contacts.phone) {
+            errors.phone = 'Необходимо указать номер телефона';
+        }
+        this.formErrors = errors;
+        this.events.emit('formErrors:change', this.formErrors);
+        return Object.keys(errors).length === 0;
     }
 
 }
