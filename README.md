@@ -137,15 +137,15 @@ yarn build
 
 Данные класс служит для отображения карточки и информации по ней в галлереи товаров
 
+Конструктор класса: 
+- `container: HTMLElement` - DOM элемент карточки товара 
+- `actions?: ICardActions` - действия с карточкой
+
 Поля класса:
 - `title: HTMLElement` - DOM элемент названия продукта
 - `image: HTMLImageElement` - DOM элемент изображения продукта
 - `category: HTMLElement` - DOM элемент категории продукта
 - `actions?: ICardActions` - DOM элемент цены продукта
-
-Конструктор класса: 
-- `container: HTMLElement` - DOM элемент карточки товара 
-- `ICardActions` - действия с карточкой
 
 Свойства класса:
 - `set title(value: string)` - устанавливает название товара
@@ -153,6 +153,20 @@ yarn build
 - `set price(value: number)` -  устанавливает цену товара
 - `set category(value: string)` - устанавливает категорию товара
 
+### Класс CardPreview
+
+Добавляет описание товара, расширяя родительский класс Card
+
+Конструктор класса: 
+- `container: HTMLElement` - DOM элемент карточки товара 
+- `actions?: ICardActions` - действия с карточкой
+
+Поля класса:
+- `_description: HTMLElement` - DOM элемент описания продукта
+- `_buttonElement: HTMLButtonElement` - DOM элемент кнопки "добавить в корзину"
+
+Свойства класса:
+- `set description(value: string)` - устанавливает описание товара
 
 ### Класс Page
 
@@ -172,6 +186,7 @@ yarn build
 - `set counter(value: number)` - устанавливает счетчик на иконке корзины
 - `set catalog(items: HTMLElement[])` - устанавливает каталог товаров
 - `set locked(value: boolean)` - устанавливает блокировку страницы при вызове модального окна
+
 
 ## Компоненты модели данных
 

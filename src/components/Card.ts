@@ -37,6 +37,10 @@ export class Card extends Component<ICard> {
         this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
         this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
         this._category = container.querySelector(`.${blockName}__category`);
+
+        if (actions?.onClick) {
+			container.addEventListener('click', actions.onClick);
+		}
     }
 
     set title(value: string) {
@@ -56,5 +60,26 @@ export class Card extends Component<ICard> {
 	set category(value: string) {
 		this.setText(this._category, value);
 		this._category.className = `card__category ${this._categoryMapping[value]}`;
+	}
+}
+
+export class CardPreview extends Card {
+	protected _description: HTMLElement;
+	protected _buttonElement: HTMLButtonElement;
+
+	constructor(container: HTMLElement, actions?: ICardActions) {
+		super(container);
+		this._description = container.querySelector(`.card__text`);
+		this._buttonElement = container.querySelector(`.card__button`);
+
+		if (actions?.onClick) {
+			if (this._buttonElement) {
+				this._buttonElement.addEventListener('click', actions.onClick);
+			}
+		}
+	}
+
+	set description(value: string) {
+		this.setText(this._description, value);
 	}
 }

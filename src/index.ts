@@ -1,10 +1,11 @@
 import { AppState } from './components/AppData';
-import { Card } from './components/Card';
+import { Card, CardPreview } from './components/Card';
 import { LarekAPI } from './components/LarekAPI';
 import { Page } from './components/Page';
 import { EventEmitter } from './components/base/events';
 import { Modal } from './components/common/Modal';
 import './scss/styles.scss';
+import { IProduct } from './types';
 import { CDN_URL, API_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 
@@ -48,6 +49,32 @@ events.on('items:changed', () => {
 	});
 });
 
+events.on('card:select', (item: IProduct) => {
+	const card = new CardPreview(cloneTemplate(cardPreviewTemplate), {
+		onClick: () => events.emit('card:add', item),
+	});
+	modal.render({
+		content: card.render({
+			title: item.title,
+			image: item.image,
+			price: item.price,
+			category: item.category,
+			description: item.description,
+		}),
+	});
+
+});
+
+
+// заморозка прокрутки при открытии модалки
+events.on('modal:open', () => {
+	page.locked = true;
+});
+
+// разморозка прокрутки при закрытии модалки
+events.on('modal:close', () => {
+	page.locked = false;
+});
 
 api.getProducts()
 	.then(appData.setCatalog.bind(appData))
