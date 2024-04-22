@@ -1,9 +1,12 @@
+import { AppState } from './components/AppData';
+import { Card } from './components/Card';
 import { LarekAPI } from './components/LarekAPI';
 import { Page } from './components/Page';
 import { EventEmitter } from './components/base/events';
+import { Modal } from './components/common/Modal';
 import './scss/styles.scss';
 import { CDN_URL, API_URL } from './utils/constants';
-import { ensureElement } from './utils/utils';
+import { cloneTemplate, ensureElement } from './utils/utils';
 
 const events = new EventEmitter();
 const api = new LarekAPI(CDN_URL, API_URL);
@@ -22,6 +25,32 @@ const orderFormTemplate = ensureElement<HTMLTemplateElement>('#order');
 const contactsFormTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 
+// Модель данных приложения
+const appData = new AppState({}, events);
+
 // Глобальные контейнеры
 
 const page = new Page(document.body, events);
+const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
+
+
+events.on('items:changed', () => {
+	page.catalog = appData.catalog.map((item) => {
+		const card = new Card(cloneTemplate(cardCatalogTemplate), {
+			onClick: () => events.emit('card:select', item),
+		});
+		return card.render({
+			title: item.title,
+			image: item.image,
+			price: item.price,
+			category: item.category,
+		});
+	});
+});
+
+
+api.getProducts()
+	.then(appData.setCatalog.bind(appData))
+	.catch((error) => {
+		console.log(error);
+	});

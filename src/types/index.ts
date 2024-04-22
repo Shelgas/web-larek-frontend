@@ -9,7 +9,7 @@ export interface IProduct {   // интерфейс товаров
 	price: number | null;
 }
 
-enum PaymentType { // перечсление способов оплаты заказа
+export enum PaymentType { // перечсление способов оплаты заказа
     Online = 'Онлайн',
     UponReceipt = 'При получении'
   }
