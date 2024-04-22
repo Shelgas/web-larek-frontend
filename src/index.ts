@@ -1,8 +1,10 @@
 import { AppState } from './components/AppData';
+import { BasketItem } from './components/BasketItem';
 import { Card, CardPreview } from './components/Card';
 import { LarekAPI } from './components/LarekAPI';
 import { Page } from './components/Page';
 import { EventEmitter } from './components/base/events';
+import { Basket } from './components/common/Basket';
 import { Modal } from './components/common/Modal';
 import './scss/styles.scss';
 import { IProduct } from './types';
@@ -33,6 +35,10 @@ const appData = new AppState({}, events);
 
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
+
+// Переиспользуемые части интерфейса
+const basket = new Basket(cloneTemplate(basketTemplate), events);
+
 
 
 events.on('items:changed', () => {
@@ -81,6 +87,31 @@ events.on('card:remove', (item: IProduct) => {
     item.status = false;
     page.counter = appData.basketCount;
     modal.close();
+});
+
+events.on('basket:open', () => {
+    let totalPrice: number = 0;
+    let index: number = 0;
+	basket.items = appData.basket.map((item) => {
+        totalPrice += item.price;
+		const card = new BasketItem(cloneTemplate(cardBasketTemplate), {
+			onClick: () => events.emit('basketItem:remove', item),
+		});
+		return card.render({
+			title: item.title,
+			price: item.price,
+            index: ++index,
+		});
+	});
+    basket.total = totalPrice;
+    modal.render({
+		content: basket.render(),
+	});
+});
+
+events.on('basketItem:remove', (item: IProduct) => {
+    events.emit('card:remove', item);
+    events.emit('basket:open');
 });
 
 

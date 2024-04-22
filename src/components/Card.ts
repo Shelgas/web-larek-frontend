@@ -21,6 +21,7 @@ export class Card extends Component<ICard> {
 	protected _category: HTMLElement;
     protected _price: HTMLElement;
     protected _image: HTMLImageElement;
+    protected _blockName: string; 
 
     protected _categoryMapping: { [key: string]: string } = {
 		'софт-скил': 'card__category_soft',
@@ -33,12 +34,12 @@ export class Card extends Component<ICard> {
     constructor(container: HTMLElement, actions?: ICardActions) {
         super(container);
 
-        const blockName = 'card';
+        this._blockName = 'card';
 
-        this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
-        this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
-        this._category = container.querySelector(`.${blockName}__category`);
-        this._price = container.querySelector(`.${blockName}__price`);
+        this._title = ensureElement<HTMLElement>(`.${this._blockName}__title`, container);
+        this._image = ensureElement<HTMLImageElement>(`.${this._blockName}__image`, container);
+        this._category = container.querySelector(`.${this._blockName}__category`);
+        this._price = container.querySelector(`.${this._blockName}__price`);
 
         if (actions?.onClick) {
 			container.addEventListener('click', actions.onClick);
@@ -104,3 +105,4 @@ export class CardPreview extends Card {
     }
 
 }
+
