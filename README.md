@@ -100,6 +100,17 @@ yarn build
 - `handleResponse(response: Response): Promise<object>` - обрабатывает ответ от сервера
 
 
+## Компоненты программы
+
+### Класс LarekAPI 
+Класс наследуется от базового класса Api, позволяет получить список карточек с сервера. 
+
+Методы класса:
+- `getProducts()` - получить список всех продуктов
+- `getProductById(id: string)` - получить продукт по id
+- `orderProducts(order: IOrder)` - оформить заказ
+
+
 ## Ключевые типы данных
  
  ```

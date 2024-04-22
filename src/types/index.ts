@@ -44,3 +44,9 @@ export interface IBasketCard { // интерфейс корзины
 	items: IBasketItem[];
 	total: number; 
 }
+
+export interface ILarekAPI { // интерфейс API
+    getProducts: () => Promise<IProduct[]>;
+    getProductById: (id: string) => Promise<IProduct>;
+    orderProducts: (order: IOrder) => void;
+}
