@@ -35,7 +35,6 @@ const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 const appData = new AppState({}, events);
 
 // Глобальные контейнеры
-
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 
@@ -43,7 +42,6 @@ const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const order = new Order(cloneTemplate<HTMLFormElement>(orderFormTemplate), events);
 const contacts = new Contacts(cloneTemplate<HTMLFormElement>(contactsFormTemplate), events);
-
 
 
 events.on('items:changed', () => {
@@ -61,11 +59,19 @@ events.on('items:changed', () => {
 });
 
 events.on('card:select', (item: IProduct) => {
-
-    const callback = item.status === true
-        ? { onClick: () => events.emit('card:remove', item)}
-        : { onClick: () => events.emit('card:add', item)}
-	const card = new CardPreview(cloneTemplate(cardPreviewTemplate), callback);
+	const card = new CardPreview(cloneTemplate(cardPreviewTemplate), {
+		onClick: () => {
+			if (item.status === true) {
+				events.emit('card:remove', item);
+				item.status = false;
+			}
+			else 
+			{
+				events.emit('card:add', item);
+				item.status = true;
+			}
+		}
+	});
 	modal.render({
 		content: card.render({
 			title: item.title,
@@ -84,14 +90,12 @@ events.on('card:add', (item: IProduct) => {
     appData.addToBasket(item);
     item.status = true;
     page.counter = appData.basketCount;
-    modal.close();
 });
 
 events.on('card:remove', (item: IProduct) => {
     appData.removeFromBasket(item);
     item.status = false;
     page.counter = appData.basketCount;
-    modal.close();
 });
 
 events.on('basket:open', () => {
@@ -141,16 +145,12 @@ events.on('order:submit', () => {
 });
 
 
-events.on(/^order\..*:change/, (data: { field: keyof IOrder, value: string }) => {
+events.on(/^(?:order|contacts)\..*:change/, (data: { field: keyof IOrder, value: string }) => {
     appData.setOrderField(data.field, data.value);
 });
 
-events.on(/^contacts\..*:change/, (data: { field: keyof IOrder, value: string }) => {
-    appData.setOrderField(data.field, data.value);
-});
 
 events.on('contacts:submit', () => {
-    console.log(appData.getRequest());
 	api.orderProducts(appData.getRequest())
 		.then((res) => {
 			const success = new Success(cloneTemplate(successTemplate), {
@@ -186,15 +186,16 @@ events.on('formErrors:change', (errors: Partial<IOrder>) => {
 		.join('; ');
 });
 
-// заморозка прокрутки при открытии модалки
+
 events.on('modal:open', () => {
 	page.locked = true;
 });
 
-// разморозка прокрутки при закрытии модалки
+
 events.on('modal:close', () => {
 	page.locked = false;
 });
+
 
 api.getProducts()
 	.then(appData.setCatalog.bind(appData))

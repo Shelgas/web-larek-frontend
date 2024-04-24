@@ -103,6 +103,7 @@ export class AppState extends Model<IAppState> {
     }
 
    clearBasket() {
+    this.basket.forEach((product) => this.events.emit('card:remove', product));
     this.basket = [];
    }
 

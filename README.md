@@ -105,10 +105,15 @@ yarn build
 ### Класс LarekAPI 
 Класс наследуется от базового класса Api, позволяет получить список карточек с сервера. 
 
+Конструктор класса:
+- `cdn: string` - адрес сервера с картинками для карточек товаров
+- `baseUrl: string` - базовый эндпоинт
+- `options: RequestInit` - опции для доступа к различным параметрам
+
 Методы класса:
-- `getProducts()` - получить список всех продуктов
-- `getProductById(id: string)` - получить продукт по id
-- `orderProducts(order: IOrder)` - оформить заказ
+- `getProducts(): Promise<IProduct[]>` - получить список всех продуктов
+- `getProductById(id: string): Promise<IProduct[]>` - получить продукт по id
+- `orderProducts(order: IOrder): Promise<IOrderRequest>` - оформить заказ
 
 ## Компоненты представления
 
@@ -165,6 +170,9 @@ yarn build
 - `_description: HTMLElement` - DOM элемент описания продукта
 - `_buttonElement: HTMLButtonElement` - DOM элемент кнопки "добавить в корзину"
 
+Методы класса:
+- `changeButtonText(): void` - изменить текст кнопки
+
 Свойства класса:
 - `set description(value: string)` - устанавливает описание товара
 
@@ -187,6 +195,101 @@ yarn build
 - `set catalog(items: HTMLElement[])` - устанавливает каталог товаров
 - `set locked(value: boolean)` - устанавливает блокировку страницы при вызове модального окна
 
+### Класс Basket 
+
+Компонент отображения корзины приложения. Отвечает за работу с корзиной
+
+Конструктор класса: 
+- `container: HTMLElement` - DOM элемент компонента корзины
+- `events: EventEmitter` - ссылка на менеджер событий для управления товарами в корзине
+
+Поля класса:
+- `list: HTMLElement` - DOM элемент списка товаров в корзине
+- `total: HTMLElement` - DOM элемент общей стоимости товаров в корзине
+- `button: HTMLButtonElement` - DOM элемент кнопки корзины оформления заказа
+
+Свойства класса:
+- `set items(items: HTMLElement[])` - установить список элементов корзины
+- `set total(total: number)` - установить общую стоимость в разметку
+
+### Класс BasketItem
+Класс отражает информацию о товаре в корзине
+
+Конструктор класса: 
+- `container: HTMLElement` - DOM элемент компонента корзины
+- `events: EventEmitter` - объект событий
+
+Поля класса:
+- `title: HTMLElement` - DOM элемент названия продукта
+- `index: HTMLElement` - DOM элемент индеска продукта
+- `price: HTMLElement` - DOM элемент стоимости продукта
+- `button: HTMLButtonElement` - DOM элемент кнопки удаления элемента из корзины 
+
+Свойства класса:
+- `set index(value: number)` - установить индеск продукта
+- `set title(value: string)` - установить название продукта
+- `set price(value: number)` - установить цену продукта
+
+### Класс Form
+
+Класс реализует компонент формы
+
+Конструктор класса:
+- `container: HTMLFormElement` - DOM элемент компонента формы
+- `events: IEvents`- объект событий
+
+Поля класса:
+- `submit: HTMLButtonElement` - DOM элемент кнопки отправки формы
+- `errors: HTMLElement` - DOM элемент отображения ошибки валидации формы
+
+Методы класса:
+- `onInputChange(field: keyof T, value: string)` - обработчик изменения в полях формы
+- `render(data: <T>): HTMLFormElement` - рендер формы
+
+Свойства класса:
+- `set valid(value: boolean)` - активирует (деактивирует) кнопку
+- `set errors(value: string)` - устанавливет ошибку
+
+### Класс Order 
+Компонент отображения выбора способа оплаты и формы адреса для доставки
+
+Конструктор класса: 
+- `container: HTMLElement:` DOM элемент формы оплаты
+- `events: IEvents` - ссылка на менеджер событий
+  
+Поля класса:
+- `buttons: HTMLButtonElement` - DOM элементы кнопок выбора варианта оплаты
+
+Метод класса:
+- `paymentChoose(name: string)`- изменение способа оплаты
+
+Свойства класса:
+- `set address(value: string)`- установить адрес 
+
+### Класс Contacts 
+Компонент отображения формы ввода контактов для совершения заказа
+
+Конструктор класса: 
+- `container: HTMLElement:` DOM элемент формы оплаты
+- `events: IEvents` - ссылка на менеджер событий
+  
+Свойства класса:
+- `set phone(value: string)`- установить номер телефона в поле формы
+- `set email(value: string)`- установить email в поле формы
+  
+### Класс Success
+Компонент отображения сообщения об успешном оформлении заказа.
+
+Конструктор класса: 
+- `container: HTMLElement:` DOM элемент формы оплаты
+- `events: IEvents` - ссылка на менеджер событий
+
+Поля класса:
+- `_close: HTMLElement` - DOM кнопка закрытия окна
+- `_total: HTMLElement` - DOM списанное количество денег
+   
+Свойства класса:
+- `set total(total: number | string)`- устанавливает потраченое количество денег
 
 ## Компоненты модели данных
 
@@ -198,7 +301,7 @@ yarn build
 - `catalog: IProduct[]` - каталог товаров
 - `order: IOrder` - хранит заказ для отправки на сервер
 
-Методы класса:
+Свойства класса:
 - `setCatalog: void` - устанавливает каталог продуктов
 
 ### Класс Product
@@ -225,12 +328,8 @@ export interface IProduct {   // интерфейс товаров
 	image: string; 
 	category: CategoryType;
 	price: number | null;
+    status: boolean;
 }
-
-enum PaymentType { // перечсление способов оплаты заказа
-    Online = 'Онлайн',
-    UponReceipt = 'При получении'
-  }
 
 export interface IContactsForm { // интерфейс формы контактных данных 
 	phone: string;
@@ -239,11 +338,16 @@ export interface IContactsForm { // интерфейс формы контакт
 
 export interface IOrderForm { // интерфейс формы с адресом доставки
 	address: string;
-	payment: PaymentType;
+	payment: string;
 }
 
 export interface IOrder extends IOrderForm, IContactsForm { // интерфейс данных заказа
-    items: string[];
+
+}
+
+export interface IOrderRequest extends IOrder {  // интерфейс данных передаваемых в запрос 
+    total: number,
+    items: string[]
 }
 
 export interface IAppState { // интерфейс данных приложения
@@ -262,5 +366,56 @@ export interface IBasketCard { // интерфейс корзины
 	items: IBasketItem[];
 	total: number; 
 }
+
+export interface ILarekAPI { // интерфейс API
+    getProducts: () => Promise<IProduct[]>;
+    getProductById: (id: string) => Promise<IProduct>;
+    orderProducts: (order: IOrder) => Promise<IOrderRequest>;
+}
+
+export type FormErrors = Partial<Record<keyof IOrder, string>>; // интерфейс ошибки
+
+
+export interface IComponentActions { // интерфейс события компонента
+    onClick: (event: MouseEvent) => void;
+}
+
+//интерфейсы представлений
+
+export interface IBasketItem {
+    index: number;
+    title: string;
+    price: number;
+}
+
+export interface ICard {
+    title: string;
+    category: CategoryType; 
+    description?: string | string[];
+    image: string;
+    price: number | null;
+    status: boolean;
+}
+
+export interface IPage {
+    counter: number;
+    catalog: HTMLElement[];
+}
+
+export interface IBasketView {
+    items: HTMLElement[];
+    total: number;
+}
+
+
+export interface IFormState {
+    valid: boolean;
+    errors: string[];
+}
+
+export interface ISuccess {
+	total: number;
+}
+
 
  ```

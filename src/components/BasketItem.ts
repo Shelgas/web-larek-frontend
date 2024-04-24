@@ -1,15 +1,5 @@
+import { IBasketItem, IComponentActions } from "../types";
 import { Component } from "./base/Component";
-
-
-export interface IBasketItem {
-    index: number;
-    title: string;
-    price: number;
-}
-
-export interface IBasketItemActions {
-    onClick: (event: MouseEvent) => void;
-}
 
 
 export class BasketItem extends Component<IBasketItem> { 
@@ -18,7 +8,7 @@ export class BasketItem extends Component<IBasketItem> {
 	protected _price: HTMLElement;
 	protected _button: HTMLButtonElement;
 
-    constructor(container: HTMLElement, actions?: IBasketItemActions) {
+    constructor(container: HTMLElement, actions?: IComponentActions) {
 		super(container);
 
 		this._title = container.querySelector(`.card__title`);

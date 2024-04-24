@@ -1,20 +1,7 @@
-import { CategoryType } from "../types";
+import { ICard, IComponentActions } from "../types";
 import { ensureElement } from "../utils/utils";
 import { Component } from "./base/Component";
 
-
-interface ICardActions {
-    onClick: (event: MouseEvent) => void;
-}
-
-export interface ICard {
-    title: string;
-    category: CategoryType; 
-    description?: string | string[];
-    image: string;
-    price: number | null;
-    status: boolean;
-}
 
 export class Card extends Component<ICard> {
     protected _title: HTMLElement;
@@ -31,7 +18,7 @@ export class Card extends Component<ICard> {
 		'кнопка': 'card__category_button',
 	};
 
-    constructor(container: HTMLElement, actions?: ICardActions) {
+    constructor(container: HTMLElement, actions?: IComponentActions) {
         super(container);
 
         this._blockName = 'card';
@@ -69,8 +56,9 @@ export class Card extends Component<ICard> {
 export class CardPreview extends Card {
 	protected _description: HTMLElement;
 	protected _buttonElement: HTMLButtonElement;
+    // protected _status: boolean;
 
-	constructor(container: HTMLElement, actions?: ICardActions) {
+	constructor(container: HTMLElement, actions?: IComponentActions) {
 		super(container);
 		this._description = container.querySelector(`.card__text`);
 		this._buttonElement = container.querySelector(`.card__button`);
@@ -79,8 +67,10 @@ export class CardPreview extends Card {
 		if (actions?.onClick) {
 			if (this._buttonElement) {
 				this._buttonElement.addEventListener('click', actions.onClick);
+                this._buttonElement.addEventListener('click', () => this.changeButtonText());
 			}
 		}
+
 	}
 
 	set description(value: string) {
@@ -99,9 +89,15 @@ export class CardPreview extends Card {
     set price(value: number | null) {
         super.price = value; 
         if (value === null) {
-            this.setText(this._buttonElement, 'Нельзя купить')
+            this.setText(this._buttonElement, 'Нельзя купить');
             this.setDisabled(this._buttonElement, true);
         }
+    }
+
+    private changeButtonText(): void {
+        this.status = this._buttonElement.textContent === 'Купить' 
+        ? true : false;
+
     }
 
 }
