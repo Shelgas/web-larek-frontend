@@ -86,6 +86,7 @@ events.on('card:select', (item: IProduct) => {
 
 });
 
+
 events.on('card:add', (item: IProduct) => {
     appData.addToBasket(item);
     item.status = true;
@@ -127,6 +128,7 @@ events.on('order:open', () => {
 	modal.render({
 		content: order.render({
 			address: '',
+			payment: '',
 			valid: false,
 			errors: [],
 		}),
@@ -153,6 +155,7 @@ events.on(/^(?:order|contacts)\..*:change/, (data: { field: keyof IOrder, value:
 events.on('contacts:submit', () => {
 	api.orderProducts(appData.getRequest())
 		.then((res) => {
+			appData.clearOrderInfo();
 			const success = new Success(cloneTemplate(successTemplate), {
 				onClick: () => {
 					modal.close();

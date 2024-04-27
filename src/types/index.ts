@@ -1,11 +1,9 @@
-export type CategoryType = 'софт-скил' | 'хард-скил' | 'другое' | 'кнопка' | 'дополнительное'; // категории товаров 
-
 export interface IProduct {   // интерфейс товаров 
     id: string;
     title: string;
 	description: string; 
 	image: string; 
-	category: CategoryType;
+	category: string;
 	price: number | null;
     status: boolean;
 }
@@ -69,7 +67,7 @@ export interface IBasketItem {
 
 export interface ICard {
     title: string;
-    category: CategoryType; 
+    category: string; 
     description?: string | string[];
     image: string;
     price: number | null;

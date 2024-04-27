@@ -14,6 +14,7 @@ export class Order extends Form<IOrderForm> {
 			container
 		);
         this._buttons.forEach((button) => {
+			
 			button.addEventListener('click', () => {
                 this.paymentChoose(button.name);
                 events.emit('order.payment:change', {
@@ -33,5 +34,15 @@ export class Order extends Form<IOrderForm> {
 	set address(value: string) {
 		(this.container.elements.namedItem('address') as HTMLInputElement).value =
 			value;
+	}
+
+	set payment(value: string) {
+		
+		this._buttons.forEach((button) => {
+			
+			if (button.classList.contains('button_alt-active')) {
+				this.toggleClass(button, 'button_alt-active');
+			}
+		});
 	}
 }

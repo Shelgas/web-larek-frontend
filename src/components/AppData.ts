@@ -4,7 +4,6 @@ import {
 	IOrder,
 	IProduct,
 	IContactsForm,
-    CategoryType,
     IOrderForm,
     FormErrors,
     IOrderRequest
@@ -19,7 +18,7 @@ export class Product extends Model<IProduct> {
     title: string;
 	description: string;
 	image: string;
-	category: CategoryType;
+	category: string;
 	status: boolean = false;
 	price: number | null;
 }
@@ -37,6 +36,7 @@ export class AppState extends Model<IAppState> {
         email: '',
         phone: '',
     };
+ 
 
     setCatalog(products: IProduct[]) {
         this.catalog = products.map(product => new Product(product, this.events));
@@ -49,6 +49,7 @@ export class AppState extends Model<IAppState> {
 	}
 
     removeFromBasket(product: IProduct) {
+        
 		const index = this.basket.indexOf(product);
         this.total -= product.price;
 		if (index >= 0) {
@@ -68,7 +69,6 @@ export class AppState extends Model<IAppState> {
 
     setOrderField(field: keyof IOrder, value: string) {
         this.order[field] = value;
-
         if (this.validateOrderForm()) {
             this.events.emit('order:ready', this.order);
         }
@@ -80,6 +80,15 @@ export class AppState extends Model<IAppState> {
             items: this.basket.map(product => product.id)
             }, 
         this.order);
+    }
+
+    clearOrderInfo(): void {
+        this.order = {
+            address: '',
+            payment: '',
+            email: '',
+            phone: '',
+        };
     }
 
 
@@ -103,7 +112,9 @@ export class AppState extends Model<IAppState> {
     }
 
    clearBasket() {
-    this.basket.forEach((product) => this.events.emit('card:remove', product));
+    this.basket.map(product => product).forEach((product) => {
+        this.events.emit('card:remove', product)
+    });
     this.basket = [];
    }
 
